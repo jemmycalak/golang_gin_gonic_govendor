@@ -20,9 +20,9 @@ func main() {
 
 	ruser := user.NewUserContrroller(db)
 	r := gin.Default()
+	// r.Use(routers.AuhtToken())
 
-	routers.CreateUserRouters(r, ruser)
-
+	routers.UserRouters(r, ruser)
 	fmt.Println("app was running")
 	r.Run(":8000")
 }

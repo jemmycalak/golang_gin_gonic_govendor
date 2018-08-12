@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/jemmycalak/go_gin_govendor/src/models"
 )
 
 func ShowUsers(db *sql.DB) (models.Users, error) {
-	querys := `SELECT * FROM "t_user"`
+	querys := `SELECT * FROM "t_user" `
 
 	var musers models.Users
 
@@ -133,4 +135,29 @@ func FindUserById(db *sql.DB, iduser int) (*models.User, error) {
 	// }
 
 	return &newmodel, nil
+}
+
+func LoginRepository(db *sql.DB, model *models.LoginStruct) (*models.User, error) {
+	query := `SELECT "iduser", "password" FROM "t_user" WHERE "email" = $1`
+
+	var newmodel models.User
+	log.Println(model.Email, model.Password)
+
+	err := db.QueryRow(query, model.Email).Scan(&newmodel.Id, &newmodel.Password)
+	if err != nil {
+		fmt.Println("User not found")
+		return nil, err
+	}
+
+	return &newmodel, nil
+}
+
+func ValidationEmail(db *sql.DB, c *gin.Context, email string) (stts bool) {
+	query := `select email from t_user where email = $1`
+	var model models.User
+	err := db.QueryRow(query, email).Scan(&model.Email)
+	if err != nil {
+		return true
+	}
+	return false
 }
